@@ -1,0 +1,11 @@
+name = "zeta70_audit"
+version = "0.1.0"
+defaultTargets = ["Zeta70Audit"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.33.1"
+
+[[lean_lib]]
+name = "Zeta70Audit"
