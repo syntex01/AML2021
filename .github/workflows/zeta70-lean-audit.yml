@@ -1,0 +1,21 @@
+name: Zeta70 Lean audit
+
+on:
+  push:
+    branches: ["audit/zeta70-lean-check"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        env:
+          LEAN_NUM_THREADS: "1"
+        with:
+          lake-package-directory: zeta70-audit
+          build: true
+          test: false
+          lint: false
+          use-mathlib-cache: true
