@@ -8,14 +8,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: leanprover/lean-action@v1
+
+      - name: Install Elan
+        run: |
+          set -euo pipefail
+          curl -sSfL https://elan.lean-lang.org/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Resolve Mathlib and restore compiled cache
+        working-directory: zeta70-audit
+        run: |
+          set -euo pipefail
+          lake update
+          lake exe cache get
+
+      - name: Kernel-check audit
+        working-directory: zeta70-audit
         env:
           LEAN_NUM_THREADS: "1"
-        with:
-          lake-package-directory: zeta70-audit
-          build: true
-          test: false
-          lint: false
-          use-mathlib-cache: true
+        run: |
+          set -euo pipefail
+          lean --version
+          lake env lean Zeta70Audit.lean
+          lake build
