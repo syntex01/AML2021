@@ -3,10 +3,12 @@ import Mathlib
 /-!
 # Audit of the claimed 640/897 zeta-zero endgame
 
-This file checks the self-contained algebra in Sections 4--6 of
+This file kernel-checks the self-contained algebra in Sections 4--6 of
 `Zeta70_70percent_Proof.md` and records the defect in the manuscript's
-Lemma 5.1. It deliberately does not postulate the unresolved Gabor-channel
+Lemma 5.1.  It deliberately does not postulate the unresolved Gabor-channel
 representation or the imported analytic number-theory statements.
+
+There are no `sorry`, `admit`, or user-declared axioms.
 -/
 
 namespace Zeta70Audit
@@ -57,7 +59,7 @@ lemma phi_le_eight {sigma t : ℝ} (hsigma : sigma < 3 / 4) :
     mul_nonneg (sq_nonneg (t - 2)) (by nlinarith [sq_nonneg t])
   nlinarith [phi_gap sigma t]
 
-/-- Manuscript inequality (5.7); no sign condition on `t` is needed. -/
+/-- Manuscript inequality (5.7); in fact no sign condition on `t` is needed. -/
 lemma phi_le_linear (sigma t : ℝ) :
     phi sigma t ≤ (1 - sigma) ^ 2 + 4 * (1 - sigma) * t := by
   simp only [phi]
@@ -68,9 +70,9 @@ def claimedRatio (v k : ℝ) : ℝ :=
   (1 - v) ^ 2 / (1 - 2 * v + k)
 
 /--
-A scalar obstruction to Lemma 5.1 as stated: for `v = 4`, `k = 16`,
-the claimed right-hand side is one. The one-dimensional choice `G = [-1]`,
-`P = 0`, `Q = G`, `s = b = 0` satisfies (1.7)--(1.8), but has `s/N = 0`.
+The scalar obstruction to Lemma 5.1 as stated: for `v = 4`, `k = 16`,
+the claimed right-hand side is one.  The one-dimensional matrix `G = [-1]`
+with `P = 0`, `Q = G`, `s = b = 0` satisfies (1.7)--(1.8), but has `s/N = 0`.
 The manuscript's unconstrained optimizer is `sigma = 4`, outside `sigma < 3/4`.
 -/
 lemma lemma5_1_numeric_obstruction :
@@ -146,9 +148,11 @@ theorem conditional_640_897_endgame
     (hmaster : ∀ sigma : ℝ, sigma < 3 / 4 →
       (1 - sigma) ^ 2 * (1 - r) ≤ sigma ^ 2 - 2 * v * sigma + k) :
     640 / 897 ≤ r := by
-  apply repaired_zero_side_target hv
-  · nlinarith [fourth_moment_constant]
-  · exact hmaster
+  have hk' : k ≤ 139 / 480 := by
+    calc
+      k ≤ 4 * (1 / 60) + 2 * (1 / 10 + 11 / 960) := hk
+      _ = 139 / 480 := fourth_moment_constant
+  exact repaired_zero_side_target (r := r) (v := v) (k := k) hv hk' hmaster
 
 #print axioms phi_factor
 #print axioms phi_gap
